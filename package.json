@@ -7,7 +7,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:gh-pages": "ng build --base-href /BIS/",
-    "deploy:gh-pages": "npx angular-cli-ghpages --dir=dist/bis",
+    "deploy:gh-pages": "npx angular-cli-ghpages --dir=dist/bis/browser",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
