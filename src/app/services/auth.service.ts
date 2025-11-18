@@ -312,7 +312,9 @@ logout(): Promise<void> {
     console.log('✅ User logged out');
     this.currentUserSubject.next(null);
     this.currentUserRoleSubject.next(null);
-    window.location.href = '/login';   // 👈 hard reload
+    // Use relative path to respect base href
+    const baseHref = document.querySelector('base')?.getAttribute('href') || '/';
+    window.location.href = baseHref + 'login';
   });
 }
 
