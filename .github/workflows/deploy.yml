@@ -27,7 +27,11 @@ jobs:
           cp src/environments/environment.prod.ts src/environments/environment.ts
       
       - name: Build
-        run: npm run build -- --base-href /BIS/
+        run: npm run build -- --base-href=/BIS/ --configuration production
+      
+      - name: Copy index.html to 404.html
+        run: |
+          cp ./dist/bis/browser/index.html ./dist/bis/browser/404.html
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
