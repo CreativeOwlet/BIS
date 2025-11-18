@@ -1,0 +1,29 @@
+<div class="dashboard-container">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <h1>Barangay Information System</h1>
+    </div>
+    <div class="navbar-actions">
+      <span *ngIf="currentUser$ | async as user">Welcome</span>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-content">
+    <div class="welcome-section">
+      <h2>Welcome to BIS</h2>
+      <p>Choose your role to continue:</p>
+    </div>
+
+    <div class="role-selection">
+      <div class="role-card" (click)="navigateToStaff()">
+        <h3>👨‍💼 Staff Dashboard</h3>
+        <p>Manage residents and approve document requests</p>
+      </div>
+      <div class="role-card" (click)="navigateToResident()">
+        <h3>👤 Resident Portal</h3>
+        <p>Request documents and check status</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+/* PrimeNG theme and icons */
+/* PrimeNG theme import removed as requested. */
+@import 'primeicons/primeicons.css';
+/* Tailwind base - replaces much of the old global CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Minimal custom utilities to preserve any app-specific tokens */
+:root {
+	--brand: #667eea;
+	--brand-2: #764ba2;
+}
+
+.btn-back {
+	@apply inline-flex items-center gap-2 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm;
+}
+
+/* Keep some legacy fallbacks for components that still use old classes */
+body {
+	@apply bg-gray-50 text-gray-800;
+}

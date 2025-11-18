@@ -1,0 +1,86 @@
+<div class="p-6">
+  <div class="flex items-center justify-between mb-4">
+    <button pButton pRipple type="button" icon="pi pi-arrow-left" (click)="goBack()" class="p-button-text p-button-sm" aria-label="Back"></button>
+    <h2 class="text-xl font-semibold">Document Requests</h2>
+    <div></div>
+  </div>
+
+  <div *ngIf="error" class="mb-4 p-3 bg-red-50 text-red-700 rounded">{{ error }}</div>
+
+  <div class="mb-4 flex items-center gap-3">
+    <label class="text-sm">Filter by Status:</label>
+    <select id="statusFilter" aria-label="Filter document requests by status" [(ngModel)]="statusFilter" (change)="filterRequests()" class="p-2 border rounded">
+      <option value="all">All Requests</option>
+      <option value="pending">Pending</option>
+      <option value="approved">Approved</option>
+      <option value="ready_for_pickup">Ready for Pickup</option>
+      <option value="completed">Completed</option>
+      <option value="needs_revision">Needs Revision</option>
+      <option value="rejected">Rejected</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="rounded bg-white p-6 shadow">Loading requests...</div>
+
+  <div *ngIf="!loading && filteredRequests.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <button *ngFor="let request of filteredRequests" type="button" (click)="selectRequest(request)" class="text-left bg-white p-4 rounded shadow cursor-pointer">
+      <div class="flex justify-between items-start">
+        <h3 class="text-md font-semibold">{{ request.residentName }}</h3>
+        <span [ngClass]="getStatusBadgeClass(request.status)" class="px-2 py-1 rounded text-sm">{{ formatStatus(request.status) }}</span>
+      </div>
+      <div class="text-sm text-gray-600 mt-2">
+        <p><strong>Document Type:</strong> {{ request.documentType }}</p>
+        <p><strong>Purpose:</strong> {{ request.purpose }}</p>
+        <p><strong>Requested on:</strong> {{ request.requestDate | date }}</p>
+      </div>
+    </button>
+  </div>
+
+  <div *ngIf="!loading && filteredRequests.length === 0" class="text-center p-8 bg-white rounded shadow">No requests found</div>
+
+  <!-- Request Details Modal -->
+  <div *ngIf="selectedRequest" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-full max-w-xl p-6" role="dialog" aria-modal="true" aria-labelledby="request-details-title" aria-describedby="request-details-desc">
+      <h3 id="request-details-title" class="text-lg font-semibold mb-3">Request Details</h3>
+      <div id="request-details-desc" class="grid gap-2">
+        <div class="flex justify-between"><strong>Resident Name:</strong><span>{{ selectedRequest.residentName }}</span></div>
+        <div class="flex justify-between"><strong>Document Type:</strong><span>{{ selectedRequest.documentType }}</span></div>
+        <div class="flex justify-between"><strong>Purpose:</strong><span>{{ selectedRequest.purpose }}</span></div>
+        <div class="flex justify-between"><strong>Status:</strong><span [ngClass]="getStatusBadgeClass(selectedRequest.status)">{{ formatStatus(selectedRequest.status) }}</span></div>
+        <div class="flex justify-between"><strong>Requested on:</strong><span>{{ selectedRequest.requestDate | date }}</span></div>
+        <div *ngIf="selectedRequest.remarks" class="flex justify-between"><strong>Remarks:</strong><span>{{ selectedRequest.remarks }}</span></div>
+        <div *ngIf="selectedRequest.revisionReason" class="flex justify-between"><strong>Revision Reason:</strong><span class="text-orange-600">{{ selectedRequest.revisionReason }}</span></div>
+
+        <div *ngIf="selectedRequest.status === 'pending'" class="mt-4">
+          <h4 class="font-semibold mb-2">Actions</h4>
+          <textarea [(ngModel)]="remarks" placeholder="Add any remarks..." class="w-full p-2 border rounded mb-2"></textarea>
+          <div class="flex gap-2">
+            <button type="button" (click)="approveRequest()" class="flex-1 px-3 py-2 bg-green-600 text-white rounded">Approve</button>
+            <button type="button" (click)="markReadyForPickup()" class="flex-1 px-3 py-2 bg-teal-500 text-white rounded">Mark Ready</button>
+            <button type="button" (click)="rejectRequest()" class="flex-1 px-3 py-2 bg-red-600 text-white rounded">Reject</button>
+            <button type="button" (click)="closeDetails()" class="flex-1 px-3 py-2 bg-gray-200 rounded">Cancel</button>
+          </div>
+        </div>
+
+        <div *ngIf="selectedRequest.status === 'approved'" class="mt-4 flex gap-2">
+          <button (click)="markReadyForPickup()" class="px-3 py-2 bg-teal-500 text-white rounded">Mark Ready for Pickup</button>
+          <button (click)="closeDetails()" class="px-3 py-2 bg-gray-200 rounded">Close</button>
+        </div>
+
+        <div *ngIf="selectedRequest.status === 'ready_for_pickup'" class="mt-4">
+          <h4 class="font-semibold mb-2">Update Status</h4>
+          <textarea [(ngModel)]="revisionReason" placeholder="Add reason for revision (optional for completed)..." class="w-full p-2 border rounded mb-2"></textarea>
+          <div class="flex gap-2">
+            <button type="button" (click)="markCompleted()" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded">Mark as Completed</button>
+            <button type="button" (click)="markNeedsRevision()" class="flex-1 px-3 py-2 bg-orange-500 text-white rounded">Needs Revision</button>
+            <button type="button" (click)="closeDetails()" class="flex-1 px-3 py-2 bg-gray-200 rounded">Cancel</button>
+          </div>
+        </div>
+
+        <div *ngIf="selectedRequest.status !== 'pending' && selectedRequest.status !== 'approved' && selectedRequest.status !== 'ready_for_pickup'" class="mt-4">
+          <button (click)="closeDetails()" class="px-3 py-2 bg-gray-200 rounded">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="max-w-3xl mx-auto p-6">
+  <div class="flex items-center gap-4 mb-6">
+    <button pButton type="button" (click)="goBack()" icon="pi pi-arrow-left" class="p-button-text p-0" aria-label="Back"></button>
+    <h2 class="text-2xl font-semibold">My Profile</h2>
+  </div>
+
+  <div *ngIf="loading" class="text-gray-600">Loading profile...</div>
+  <div *ngIf="error" class="bg-red-50 text-red-700 p-3 rounded mb-4">{{ error }}</div>
+  <div *ngIf="success" class="bg-green-50 text-green-700 p-3 rounded mb-4">{{ success }}</div>
+
+  <form *ngIf="!loading && !error" (ngSubmit)="save()" class="bg-white p-6 rounded shadow space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Full name</label>
+      <input [(ngModel)]="resident.name" name="name" class="mt-1 block w-full border rounded px-3 py-2" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Email</label>
+      <input [value]="resident.email" readonly class="mt-1 block w-full border rounded px-3 py-2 bg-gray-100" />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Phone</label>
+        <input [(ngModel)]="resident.phone" name="phone" class="mt-1 block w-full border rounded px-3 py-2" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Barangay</label>
+        <input [(ngModel)]="resident.barangay" name="barangay" class="mt-1 block w-full border rounded px-3 py-2" />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Address</label>
+      <input [(ngModel)]="resident.address" name="address" class="mt-1 block w-full border rounded px-3 py-2" />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Gender</label>
+        <select [(ngModel)]="resident.gender" name="gender" class="mt-1 block w-full border rounded px-3 py-2">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Civil status</label>
+        <select [(ngModel)]="resident.civilStatus" name="civilStatus" class="mt-1 block w-full border rounded px-3 py-2">
+          <option value="single">Single</option>
+          <option value="married">Married</option>
+          <option value="widowed">Widowed</option>
+          <option value="divorced">Divorced</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Date of birth</label>
+        <input [(ngModel)]="resident.dateOfBirth" name="dateOfBirth" type="date" class="mt-1 block w-full border rounded px-3 py-2" />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Occupation</label>
+      <input [(ngModel)]="resident.occupation" name="occupation" class="mt-1 block w-full border rounded px-3 py-2" />
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button type="submit" [disabled]="saving" class="px-4 py-2 bg-indigo-600 text-white rounded">{{ saving ? 'Saving...' : 'Save Changes' }}</button>
+      <button type="button" (click)="goBack()" class="px-4 py-2 border rounded">Cancel</button>
+    </div>
+  </form>
+</div>

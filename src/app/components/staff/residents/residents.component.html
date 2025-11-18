@@ -1,0 +1,187 @@
+<div class="p-6">
+  <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+    <div class="flex gap-2 w-full sm:w-auto">
+      <button pButton pRipple type="button" icon="pi pi-arrow-left" (click)="goBack()" class="p-button-text p-button-sm" aria-label="Back"></button>
+      <h2 class="text-xl font-semibold flex-1 text-center sm:text-left">Resident Management</h2>
+    </div>
+  <button type="button" (click)="openAddForm()" class="hidden sm:inline-block sm:w-auto px-4 py-2 rounded bg-indigo-600 text-white font-medium hover:bg-indigo-700">+ Add New Resident</button>
+  <!-- Sticky Add New Resident button for mobile -->
+  <button type="button" (click)="openAddForm()" class="fixed bottom-0 left-0 right-0 z-40 w-full sm:hidden px-4 py-3 bg-indigo-600 text-white font-medium text-lg rounded-none shadow-lg">+ Add New Resident</button>
+  </div>
+
+  <div *ngIf="error" class="mb-4 p-3 bg-red-50 text-red-700 rounded">{{ error }}</div>
+
+  <div class="mb-4">
+    <input type="text" [(ngModel)]="searchQuery" placeholder="Search residents by name..." (keyup)="searchResidents()" class="w-full md:w-1/2 p-2 border rounded" />
+  </div>
+
+  <div *ngIf="loading" class="rounded bg-white p-6 shadow">Loading residents...</div>
+
+  <!-- Card layout for mobile, table for md+ screens -->
+  <div *ngIf="!loading && residents.length > 0">
+    <!-- Table for md+ -->
+    <div class="hidden md:block bg-white rounded shadow overflow-x-auto">
+      <table class="w-full min-w-[700px] table-auto">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-3 text-left">Name</th>
+            <th class="p-3 text-left">Age</th>
+            <th class="p-3 text-left">Address</th>
+            <th class="p-3 text-left">Phone</th>
+            <th class="p-3 text-left">Email</th>
+            <th class="p-3 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let resident of residents" class="hover:bg-gray-50">
+            <td class="p-3">{{ resident.name }}</td>
+            <td class="p-3">{{ calculateAge(resident.dateOfBirth) }}</td>
+            <td class="p-3">{{ resident.address }}</td>
+            <td class="p-3">{{ resident.phone }}</td>
+            <td class="p-3">{{ resident.email }}</td>
+            <td class="p-3 flex gap-2">
+              <button type="button" (click)="openEdit(resident)" class="px-2 py-1 bg-teal-500 text-white rounded">Edit</button>
+              <button (click)="deleteResident(resident.id)" class="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Card layout for mobile -->
+    <div class="md:hidden flex flex-col gap-4">
+      <div *ngFor="let resident of residents" class="bg-white rounded shadow p-4 flex flex-col gap-2">
+        <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div class="font-semibold text-base">{{ resident.name }}</div>
+          <div class="text-xs text-gray-500">Age: {{ calculateAge(resident.dateOfBirth) }}</div>
+        </div>
+        <div class="text-sm text-gray-700"><span class="font-medium">Address:</span> {{ resident.address }}</div>
+        <div class="text-sm text-gray-700"><span class="font-medium">Phone:</span> {{ resident.phone }}</div>
+        <div class="text-sm text-gray-700"><span class="font-medium">Email:</span> {{ resident.email }}</div>
+        <div class="flex flex-col gap-2 mt-2 sm:flex-row">
+          <button type="button" (click)="openEdit(resident)" class="w-full px-3 py-2 bg-teal-500 text-white rounded">Edit</button>
+          <button (click)="deleteResident(resident.id)" class="w-full px-3 py-2 bg-red-500 text-white rounded">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && residents.length === 0" class="text-center p-8 bg-white rounded shadow">No residents found</div>
+
+  <!-- Add Resident Modal -->
+  <div *ngIf="showAddForm" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-full max-w-lg p-6" role="dialog" aria-modal="true" aria-labelledby="add-resident-title" (click)="$event.stopPropagation()">
+      <h3 id="add-resident-title" class="text-lg font-semibold mb-3">Add New Resident</h3>
+      <form (ngSubmit)="addResident()" class="space-y-3">
+        <div>
+          <label for="addName" class="block mb-1 font-medium">Full Name:</label>
+          <input [(ngModel)]="newResident.name" id="addName" name="addName" required placeholder="Full name" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="addDateOfBirth" class="block mb-1 font-medium">Date of Birth:</label>
+          <input type="date" [(ngModel)]="newResident.dateOfBirth" id="addDateOfBirth" name="addDateOfBirth" required class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="addGender" class="block mb-1 font-medium">Gender:</label>
+          <select [(ngModel)]="newResident.gender" id="addGender" name="addGender" class="w-full p-2 border rounded">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="addAddress" class="block mb-1 font-medium">Address:</label>
+          <input [(ngModel)]="newResident.address" id="addAddress" name="addAddress" required placeholder="Address" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="addBarangay" class="block mb-1 font-medium">Barangay:</label>
+          <input [(ngModel)]="newResident.barangay" id="addBarangay" name="addBarangay" required placeholder="Barangay" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="addPhone" class="block mb-1 font-medium">Phone:</label>
+          <input [(ngModel)]="newResident.phone" id="addPhone" name="addPhone" required placeholder="Phone" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="addEmail" class="block mb-1 font-medium">Email:</label>
+          <input type="email" [(ngModel)]="newResident.email" id="addEmail" name="addEmail" required placeholder="Email" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="addCivilStatus" class="block mb-1 font-medium">Civil Status:</label>
+          <select [(ngModel)]="newResident.civilStatus" id="addCivilStatus" name="addCivilStatus" class="w-full p-2 border rounded">
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="widowed">Widowed</option>
+            <option value="divorced">Divorced</option>
+          </select>
+        </div>
+        <div>
+          <label for="addOccupation" class="block mb-1 font-medium">Occupation:</label>
+          <input [(ngModel)]="newResident.occupation" id="addOccupation" name="addOccupation" placeholder="Occupation" class="w-full p-2 border rounded" />
+        </div>
+
+        <div class="flex gap-2 justify-end mt-3">
+          <button type="submit" class="px-3 py-2 bg-indigo-600 text-white rounded">Add Resident</button>
+          <button type="button" (click)="closeAddForm()" class="px-3 py-2 bg-gray-200 rounded">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Resident Modal -->
+  <div *ngIf="selectedResident" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-full max-w-lg p-6" role="dialog" aria-modal="true" aria-labelledby="edit-resident-title" (click)="$event.stopPropagation()">
+      <h3 id="edit-resident-title" class="text-lg font-semibold mb-3">Edit Resident</h3>
+      <form (ngSubmit)="saveEdit()" class="space-y-3">
+        <div>
+          <label for="editName" class="block mb-1 font-medium">Full Name:</label>
+          <input [(ngModel)]="selectedResident.name" id="editName" name="editName" required placeholder="Full name" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="editDateOfBirth" class="block mb-1 font-medium">Date of Birth:</label>
+          <input type="date" [(ngModel)]="selectedResident.dateOfBirth" id="editDateOfBirth" name="editDateOfBirth" required class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="editGender" class="block mb-1 font-medium">Gender:</label>
+          <select [(ngModel)]="selectedResident.gender" id="editGender" name="editGender" class="w-full p-2 border rounded">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="editAddress" class="block mb-1 font-medium">Address:</label>
+          <input [(ngModel)]="selectedResident.address" id="editAddress" name="editAddress" required placeholder="Address" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="editBarangay" class="block mb-1 font-medium">Barangay:</label>
+          <input [(ngModel)]="selectedResident.barangay" id="editBarangay" name="editBarangay" required placeholder="Barangay" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="editPhone" class="block mb-1 font-medium">Phone:</label>
+          <input [(ngModel)]="selectedResident.phone" id="editPhone" name="editPhone" required placeholder="Phone" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="editEmail" class="block mb-1 font-medium">Email:</label>
+          <input type="email" [(ngModel)]="selectedResident.email" id="editEmail" name="editEmail" required placeholder="Email" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label for="editCivilStatus" class="block mb-1 font-medium">Civil Status:</label>
+          <select [(ngModel)]="selectedResident.civilStatus" id="editCivilStatus" name="editCivilStatus" class="w-full p-2 border rounded">
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="widowed">Widowed</option>
+            <option value="divorced">Divorced</option>
+          </select>
+        </div>
+        <div>
+          <label for="editOccupation" class="block mb-1 font-medium">Occupation:</label>
+          <input [(ngModel)]="selectedResident.occupation" id="editOccupation" name="editOccupation" placeholder="Occupation" class="w-full p-2 border rounded" />
+        </div>
+
+        <div class="flex gap-2 justify-end mt-3">
+          <button type="submit" class="px-3 py-2 bg-indigo-600 text-white rounded">Save Changes</button>
+          <button type="button" (click)="closeEdit()" class="px-3 py-2 bg-gray-200 rounded">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+<div class="min-h-screen flex bg-gray-50">
+  <aside class="w-64 bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-6 hidden md:block" role="complementary" aria-label="Resident sidebar">
+      <h2 class="text-lg font-semibold">BIS Resident</h2>
+      <nav class="mt-6 space-y-1" role="navigation" aria-label="Resident navigation">
+  <button type="button" (click)="navigateTo('dashboard')" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">🏠 Dashboard</button>
+  <button type="button" (click)="navigateTo('profile')" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">👤 Profile</button>
+        <button type="button" (click)="navigateTo('request-document')" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">📝 Request Document</button>
+        <button type="button" (click)="navigateTo('my-requests')" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">📋 My Requests</button>
+        <button type="button" (click)="navigateTo('announcements')" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">📢 Announcements</button>
+        <button type="button" (click)="logout()" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">🚪 Logout</button>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex-1 p-6">
+      <header class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <button type="button" class="md:hidden p-2 rounded bg-gray-100" (click)="toggleMobileSidebar()" aria-label="Open sidebar">☰</button>
+          <h1 class="text-2xl font-bold text-gray-800">Resident Dashboard</h1>
+        </div>
+        <div class="text-indigo-600 font-medium" *ngIf="currentUser$ | async as user">Welcome</div>
+      </header>
+
+      <section class="space-y-6">
+        <div class="rounded-lg p-6 bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow">
+          <h2 class="text-2xl font-semibold">Welcome Back!</h2>
+          <p class="opacity-90 mt-2">Manage your document requests and stay updated with barangay announcements.</p>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow">
+          <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+          <div class="grid md:grid-cols-3 gap-4">
+            <button type="button" (click)="navigateTo('request-document')" class="flex flex-col items-center gap-2 p-4 rounded-lg bg-indigo-600 text-white hover:shadow">
+              <span class="text-2xl">📝</span>
+              <span class="font-medium">Request Document</span>
+            </button>
+            <button type="button" (click)="navigateTo('my-requests')" class="flex flex-col items-center gap-2 p-4 rounded-lg bg-indigo-600 text-white hover:shadow">
+              <span class="text-2xl">📋</span>
+              <span class="font-medium">Check Requests</span>
+            </button>
+            <button type="button" (click)="navigateTo('announcements')" class="flex flex-col items-center gap-2 p-4 rounded-lg bg-indigo-600 text-white hover:shadow">
+              <span class="text-2xl">📢</span>
+              <span class="font-medium">View Announcements</span>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="!loading" class="bg-white rounded-lg p-6 shadow">
+          <h3 class="text-lg font-semibold mb-4">Recent Requests</h3>
+
+          <div *ngIf="recentRequests.length > 0" class="space-y-3">
+            <button *ngFor="let request of recentRequests" type="button" (click)="navigateTo('my-requests')" class="w-full flex justify-between items-center p-3 bg-gray-50 rounded border text-left hover:bg-gray-100">
+              <div class="flex items-center gap-4">
+                <div class="font-semibold text-gray-800 capitalize">{{ request.documentType }}</div>
+                <div [style.color]="getStatusColor(request.status)" class="text-xs font-semibold uppercase" aria-hidden="true">{{ formatStatus(request.status) }}</div>
+              </div>
+              <div class="text-sm text-gray-500">{{ request.requestDate | date: 'short' }}</div>
+            </button>
+          </div>
+
+          <div *ngIf="recentRequests.length === 0" class="text-center text-gray-500">
+            <p>No requests yet. <a (click)="navigateTo('request-document')" class="text-indigo-600 font-medium">Create one now</a></p>
+          </div>
+        </div>
+
+        <div *ngIf="recentAnnouncements.length > 0" class="bg-white rounded-lg p-6 shadow mt-6">
+          <h3 class="text-lg font-semibold mb-4">Recent Announcements</h3>
+          <div class="space-y-3">
+            <button *ngFor="let ann of recentAnnouncements" type="button" (click)="navigateTo('announcements')" class="w-full text-left p-3 bg-gray-50 rounded border hover:bg-gray-100">
+              <div class="flex justify-between items-start">
+                <div>
+                  <div class="font-semibold text-gray-800">{{ ann.title }}</div>
+                  <div class="text-sm text-gray-600 mt-1">{{ ann.content | slice:0:100 }}{{ ann.content ? (ann.content.length > 100 ? '...' : '') : '' }}</div>
+                </div>
+                <div class="text-xs text-gray-400 ml-4">{{ ann.createdAt | date: 'short' }}</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  <!-- Mobile sidebar overlay -->
+  <div *ngIf="mobileSidebarOpen" class="fixed inset-0 z-40 md:hidden">
+    <div class="absolute inset-0 bg-black/50" (click)="closeMobileSidebar()" aria-hidden="true"></div>
+    <aside class="absolute left-0 top-0 bottom-0 w-64 bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-6">
+      <h2 class="text-lg font-semibold">BIS Resident</h2>
+      <nav class="mt-6 space-y-1">
+        <button type="button" (click)="navigateTo('dashboard'); closeMobileSidebar()" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">🏠 Dashboard</button>
+        <button type="button" (click)="navigateTo('profile'); closeMobileSidebar()" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">👤 Profile</button>
+        <button type="button" (click)="navigateTo('request-document'); closeMobileSidebar()" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">📝 Request Document</button>
+        <button type="button" (click)="navigateTo('my-requests'); closeMobileSidebar()" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">📋 My Requests</button>
+        <button type="button" (click)="navigateTo('announcements'); closeMobileSidebar()" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">📢 Announcements</button>
+        <button type="button" (click)="logout(); closeMobileSidebar()" class="w-full text-left py-2 px-3 rounded hover:bg-white/10">🚪 Logout</button>
+      </nav>
+    </aside>
+  </div>
+</div>

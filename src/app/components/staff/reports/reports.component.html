@@ -1,0 +1,86 @@
+<div class="p-6">
+  <div class="flex items-center justify-between mb-4">
+     <button pButton pRipple type="button" icon="pi pi-arrow-left" (click)="goBack()" class="p-button-text p-button-sm" aria-label="Back"></button>
+    <h2 class="text-xl font-semibold">Reports & Analytics</h2>
+    <div></div>
+  </div>
+
+  <div *ngIf="error" class="mb-4 p-3 bg-red-50 text-red-700 rounded">{{ error }}</div>
+  <div *ngIf="loading" class="rounded bg-white p-6 shadow">Loading reports...</div>
+
+  <div *ngIf="!loading && !error" class="space-y-6">
+    <section class="bg-white p-4 rounded shadow">
+      <h3 class="text-lg font-semibold mb-3">Resident Statistics</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div class="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded text-center">
+          <div class="text-xs font-semibold text-gray-500 uppercase">Total Residents</div>
+          <div class="text-2xl font-bold text-indigo-600">{{ residentReport?.totalResidents || 0 }}</div>
+        </div>
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs font-semibold text-gray-500 uppercase">Male</div>
+          <div class="text-2xl font-bold text-blue-600">{{ residentReport?.totalMale || 0 }}</div>
+        </div>
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs font-semibold text-gray-500 uppercase">Female</div>
+          <div class="text-2xl font-bold text-pink-600">{{ residentReport?.totalFemale || 0 }}</div>
+        </div>
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs font-semibold text-gray-500 uppercase">Other</div>
+          <div class="text-2xl font-bold text-gray-600">{{ residentReport?.totalOther || 0 }}</div>
+        </div>
+      </div>
+      <div class="flex gap-4 items-center">
+        <div class="w-40 h-40 bg-gray-100 rounded-full flex items-center justify-center">Chart</div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2"><span class="w-4 h-4 bg-indigo-500 rounded"></span> Male</div>
+          <div class="flex items-center gap-2"><span class="w-4 h-4 bg-purple-600 rounded"></span> Female</div>
+          <div class="flex items-center gap-2"><span class="w-4 h-4 bg-gray-400 rounded"></span> Other</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white p-4 rounded shadow">
+      <h3 class="text-lg font-semibold mb-3">Document Request Statistics</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs text-gray-500">Pending Requests</div>
+          <div class="text-2xl font-bold text-yellow-500">{{ documentReport?.pendingRequests || 0 }}</div>
+        </div>
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs text-gray-500">Approved Requests</div>
+          <div class="text-2xl font-bold text-green-600">{{ documentReport?.approvedRequests || 0 }}</div>
+        </div>
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs text-gray-500">Ready for Pickup</div>
+          <div class="text-2xl font-bold text-teal-500">{{ documentReport?.readyForPickup || 0 }}</div>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="font-semibold">Request Completion Rate</h4>
+        <div class="w-full h-3 bg-gray-200 rounded mt-2 overflow-hidden">
+          <div class="h-3 bg-gradient-to-r from-indigo-500 to-purple-600" [style.width.%]="getCompletionPercentage()"></div>
+        </div>
+        <p class="mt-2 text-sm text-gray-600">{{ getCompletionPercentage() }}% of requests completed</p>
+      </div>
+    </section>
+
+    <section class="bg-white p-4 rounded shadow">
+      <h3 class="text-lg font-semibold mb-3">Document Type Breakdown</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full table-auto">
+          <thead class="bg-gray-100">
+            <tr><th class="p-2 text-left">Document Type</th><th class="p-2 text-left">Count</th></tr>
+          </thead>
+          <tbody>
+            <tr class="border-b"><td class="p-2">Barangay Clearance</td><td class="p-2">{{ documentReport?.barangayClearance || 0 }}</td></tr>
+            <tr class="border-b"><td class="p-2">Certificate of Residency</td><td class="p-2">{{ documentReport?.certificateOfResidency || 0 }}</td></tr>
+            <tr class="border-b"><td class="p-2">Certificate of Indigency</td><td class="p-2">{{ documentReport?.certificateOfIndigency || 0 }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="text-center text-sm text-gray-500">Last updated: {{ residentReport?.lastUpdated | date: 'medium' }}</div>
+  </div>
+</div>

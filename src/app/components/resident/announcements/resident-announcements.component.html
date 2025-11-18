@@ -1,0 +1,47 @@
+<div class="max-w-4xl mx-auto p-4">
+  <div class="flex items-center gap-4 mb-6">
+    <button pButton type="button" (click)="goBack()" icon="pi pi-arrow-left" class="p-button-text p-0" aria-label="Back"></button>
+    <div>
+      <h2 class="text-2xl font-semibold">Barangay Announcements</h2>
+      <p class="text-sm text-gray-600">Stay updated with the latest news and events</p>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="mb-4 p-3 bg-red-50 text-red-700 rounded">{{ error }}</div>
+
+  <div *ngIf="!loading" class="flex flex-wrap gap-2 mb-4">
+    <button type="button" (click)="filterByCategory('all')" [class]="categoryFilter === 'all' ? 'px-3 py-1 rounded-full bg-indigo-600 text-white' : 'px-3 py-1 rounded-full bg-gray-100'">All</button>
+    <button type="button" (click)="filterByCategory('event')" [class]="categoryFilter === 'event' ? 'px-3 py-1 rounded-full bg-indigo-600 text-white' : 'px-3 py-1 rounded-full bg-gray-100'">🎉 Events</button>
+    <button type="button" (click)="filterByCategory('alert')" [class]="categoryFilter === 'alert' ? 'px-3 py-1 rounded-full bg-indigo-600 text-white' : 'px-3 py-1 rounded-full bg-gray-100'">⚠️ Alerts</button>
+    <button type="button" (click)="filterByCategory('update')" [class]="categoryFilter === 'update' ? 'px-3 py-1 rounded-full bg-indigo-600 text-white' : 'px-3 py-1 rounded-full bg-gray-100'">📢 Updates</button>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-10 text-gray-600">Loading announcements...</div>
+
+  <div *ngIf="!loading && getFilteredAnnouncements().length > 0" class="grid md:grid-cols-2 gap-4 mb-6">
+    <button *ngFor="let announcement of getFilteredAnnouncements()" type="button" (click)="selectAnnouncement(announcement)" class="text-left p-4 bg-white rounded shadow cursor-pointer">
+      <div class="text-2xl mb-2">{{ getCategoryIcon(announcement.category) }}</div>
+      <h3 class="font-semibold text-lg">{{ announcement.title || 'Untitled Announcement' }}</h3>
+      <p class="text-sm text-gray-600 mt-2">{{ announcement.content ? (announcement.content | slice:0:150) + '...' : 'No details provided.' }}</p>
+      <div class="flex items-center justify-between mt-3 pt-3 border-t">
+        <span class="text-xs uppercase bg-indigo-600 text-white px-2 py-1 rounded">{{ getCategoryLabel(announcement.category) }}</span>
+        <span class="text-xs text-gray-500">{{ announcement.createdAt | date: 'short' }}</span>
+      </div>
+    </button>
+  </div>
+
+  <div *ngIf="!loading && getFilteredAnnouncements().length === 0" class="text-center p-8 bg-white rounded shadow">No announcements in this category</div>
+
+  <div *ngIf="selectedAnnouncement" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4" (click)="closeDetails()">
+    <div class="bg-white rounded-lg max-w-2xl w-full p-6" role="dialog" aria-modal="true" aria-labelledby="announcement-title" aria-describedby="announcement-desc" (click)="$event.stopPropagation()">
+      <button type="button" class="float-right text-gray-500" aria-label="Close announcement details" (click)="closeDetails()">✕</button>
+      <div class="flex items-center gap-4 mb-4">
+        <div class="text-3xl">{{ getCategoryIcon(selectedAnnouncement.category) }}</div>
+        <h2 id="announcement-title" class="text-xl font-semibold">{{ selectedAnnouncement.title }}</h2>
+      </div>
+      <div id="announcement-desc" class="flex items-center gap-3 text-sm text-gray-500 mb-4"><span class="uppercase bg-indigo-600 text-white px-2 py-1 rounded">{{ getCategoryLabel(selectedAnnouncement.category) }}</span><span>{{ selectedAnnouncement.createdAt | date: 'medium' }}</span></div>
+      <div class="prose max-w-none">{{ selectedAnnouncement.content }}</div>
+      <div *ngIf="selectedAnnouncement.attachmentUrl" class="mt-4 p-3 bg-gray-50 rounded">Attachment: <a [href]="selectedAnnouncement.attachmentUrl" target="_blank" class="text-indigo-600">Download</a></div>
+    </div>
+  </div>
+</div>
