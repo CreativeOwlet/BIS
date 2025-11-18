@@ -6,6 +6,8 @@
     "postinstall": "node -e \"try { require('child_process').execSync('npx tailwindcss -v', {stdio: 'ignore'}); } catch (e) {}\"",
     "start": "ng serve",
     "build": "ng build",
+    "build:gh-pages": "ng build --base-href /BIS/",
+    "deploy:gh-pages": "npx angular-cli-ghpages --dir=dist/bis",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

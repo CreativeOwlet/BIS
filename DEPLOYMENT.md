@@ -1,5 +1,25 @@
 # Barangay Information System - Deployment Guide
 
+## 🌐 GitHub Pages Deployment
+
+**Live URL**: https://creativeowlet.github.io/BIS/
+
+The application is automatically deployed to GitHub Pages when you push to the `main` branch.
+
+### Auto-Deployment Setup (Already Configured)
+- ✅ GitHub Actions workflow created (`.github/workflows/deploy.yml`)
+- ✅ Builds and deploys automatically on every push to `main`
+- ✅ Base href configured for GitHub Pages (`/BIS/`)
+
+### Manual Deployment (if needed)
+```bash
+# Build for GitHub Pages
+npm run build -- --base-href /BIS/
+
+# Deploy to GitHub Pages
+npx angular-cli-ghpages --dir=dist/bis
+```
+
 ## 📦 Production Build
 
 The application has been successfully built for production. The output is in the `dist/bis` folder.
