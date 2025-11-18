@@ -22,6 +22,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Create environment file
+        run: |
+          cp src/environments/environment.prod.ts src/environments/environment.ts
+      
       - name: Build
         run: npm run build -- --base-href /BIS/
       
