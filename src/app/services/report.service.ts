@@ -46,14 +46,21 @@ export class ReportService {
       map(snapshot => {
         const requests = snapshot.docs.map(doc => doc.data() as any);
         
+        // Count documents issued (completed + ready_for_pickup)
+        const totalDocumentsIssued = requests.filter(r => 
+          r.status === 'completed' || r.status === 'ready_for_pickup'
+        ).length;
+        
         return {
-          totalDocumentsIssued: requests.filter(r => r.status === 'approved').length,
-          barangayClearance: requests.filter(r => r.documentType === 'barangay_clearance').length,
-          certificateOfResidency: requests.filter(r => r.documentType === 'certificate_of_residency').length,
-          certificateOfIndigency: requests.filter(r => r.documentType === 'certificate_of_indigency').length,
+          totalDocumentsIssued,
+          barangayClearance: requests.filter(r => r.documentType === 'barangay_clearance' && (r.status === 'completed' || r.status === 'ready_for_pickup')).length,
+          certificateOfResidency: requests.filter(r => r.documentType === 'certificate_of_residency' && (r.status === 'completed' || r.status === 'ready_for_pickup')).length,
+          certificateOfIndigency: requests.filter(r => r.documentType === 'certificate_of_indigency' && (r.status === 'completed' || r.status === 'ready_for_pickup')).length,
           pendingRequests: requests.filter(r => r.status === 'pending').length,
           approvedRequests: requests.filter(r => r.status === 'approved').length,
           readyForPickup: requests.filter(r => r.status === 'ready_for_pickup').length,
+          completedRequests: requests.filter(r => r.status === 'completed').length,
+          needsRevision: requests.filter(r => r.status === 'needs_revision').length,
           rejectedRequests: requests.filter(r => r.status === 'rejected').length,
           lastUpdated: new Date()
         } as DocumentReport;

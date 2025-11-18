@@ -41,7 +41,12 @@
 
     <section class="bg-white p-4 rounded shadow">
       <h3 class="text-lg font-semibold mb-3">Document Request Statistics</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div class="p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded text-center">
+          <div class="text-xs font-semibold text-gray-500 uppercase">Total Issued</div>
+          <div class="text-2xl font-bold text-indigo-600">{{ documentReport?.totalDocumentsIssued || 0 }}</div>
+          <div class="text-xs text-gray-400 mt-1">Completed + Ready</div>
+        </div>
         <div class="p-4 bg-gray-50 rounded text-center">
           <div class="text-xs text-gray-500">Pending Requests</div>
           <div class="text-2xl font-bold text-yellow-500">{{ documentReport?.pendingRequests || 0 }}</div>
@@ -56,6 +61,21 @@
         </div>
       </div>
 
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs text-gray-500">Completed</div>
+          <div class="text-2xl font-bold text-blue-600">{{ documentReport?.completedRequests || 0 }}</div>
+        </div>
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs text-gray-500">Needs Revision</div>
+          <div class="text-2xl font-bold text-orange-500">{{ documentReport?.needsRevision || 0 }}</div>
+        </div>
+        <div class="p-4 bg-gray-50 rounded text-center">
+          <div class="text-xs text-gray-500">Rejected</div>
+          <div class="text-2xl font-bold text-red-600">{{ documentReport?.rejectedRequests || 0 }}</div>
+        </div>
+      </div>
+
       <div>
         <h4 class="font-semibold">Request Completion Rate</h4>
         <div class="w-full h-3 bg-gray-200 rounded mt-2 overflow-hidden">
@@ -66,11 +86,11 @@
     </section>
 
     <section class="bg-white p-4 rounded shadow">
-      <h3 class="text-lg font-semibold mb-3">Document Type Breakdown</h3>
+      <h3 class="text-lg font-semibold mb-3">Document Type Breakdown (Issued Documents)</h3>
       <div class="overflow-x-auto">
         <table class="w-full table-auto">
           <thead class="bg-gray-100">
-            <tr><th class="p-2 text-left">Document Type</th><th class="p-2 text-left">Count</th></tr>
+            <tr><th class="p-2 text-left">Document Type</th><th class="p-2 text-left">Issued Count</th></tr>
           </thead>
           <tbody>
             <tr class="border-b"><td class="p-2">Barangay Clearance</td><td class="p-2">{{ documentReport?.barangayClearance || 0 }}</td></tr>

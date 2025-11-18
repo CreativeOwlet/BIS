@@ -79,13 +79,15 @@ export interface ResidentReport {
 }
 
 export interface DocumentReport {
-  totalDocumentsIssued: number;
-  barangayClearance: number;
-  certificateOfResidency: number;
-  certificateOfIndigency: number;
+  totalDocumentsIssued: number; // completed + ready_for_pickup
+  barangayClearance: number; // issued barangay clearances
+  certificateOfResidency: number; // issued certificates of residency
+  certificateOfIndigency: number; // issued certificates of indigency
   pendingRequests: number;
   approvedRequests: number;
   readyForPickup: number;
+  completedRequests: number; // new field for completed documents
+  needsRevision: number; // new field for documents needing revision
   rejectedRequests: number;
   lastUpdated: Date;
 }

@@ -1,18 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
 import { ReportService } from '../../../services';
 import { ResidentReport, DocumentReport } from '../../../models';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, forkJoin } from 'rxjs';
+import { takeUntil, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
   imports: [CommonModule, ButtonModule],
   templateUrl: './reports.component.html',
-  styleUrl: './reports.component.css'
+  styleUrls: ['./reports.component.css']
 })
 export class ReportsComponent implements OnInit, OnDestroy {
   residentReport: ResidentReport | null = null;
@@ -21,7 +21,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
   error = '';
   private destroy$ = new Subject<void>();
 
-  constructor(private reportService: ReportService, private router: Router) {}
+  constructor(
+    private reportService: ReportService, 
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadReports();
@@ -33,28 +37,25 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   loadReports(): void {
     this.loading = true;
+    this.error = '';
 
-    this.reportService.getResidentStatistics()
+    forkJoin({
+      residents: this.reportService.getResidentStatistics(),
+      documents: this.reportService.getDocumentStatistics()
+    })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (report) => {
-          this.residentReport = report;
+        next: (reports) => {
+          this.residentReport = reports.residents;
+          this.documentReport = reports.documents;
+          this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
-          this.error = 'Failed to load resident statistics';
-        }
-      });
-
-    this.reportService.getDocumentStatistics()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (report) => {
-          this.documentReport = report;
+          console.error('Error loading reports:', err);
+          this.error = 'Failed to load reports. Please try again.';
           this.loading = false;
-        },
-        error: (err) => {
-          this.error = 'Failed to load document statistics';
-          this.loading = false;
+          this.cdr.detectChanges();
         }
       });
   }
